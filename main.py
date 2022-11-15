@@ -8,14 +8,25 @@ BACKGROUND = "#6C7D47"
 NAVY = "#324A5F"
 
 # FUNCTIONALITY
-data = pandas.read_csv("data/french_words.csv")
-cards = data.to_dict(orient="records")
+try:
+    data = pandas.read_csv("data/words_to_learn.csv")
+except FileNotFoundError:
+    data = pandas.read_csv("data/french_words.csv")
+finally:
+    cards = data.to_dict(orient="records")
 
 def next_card():
     current_card = random.choice(cards)
-    canvas.itemconfig(card_title, text="French")
-    canvas.itemconfig(card_word, text=current_card["French"])
+    canvas.itemconfig(card_title, text="French", fill="black")
+    canvas.itemconfig(card_word, text=current_card["French"], fill="black")
     return current_card
+
+def right_card():
+    global value
+    cards.remove(value)
+    words_to_learn = pandas.DataFrame(cards)
+    words_to_learn.to_csv("data/words_to_learn.csv", index=False)
+    value = next_card()
 
 def flip_card():
     canvas.itemconfig(card_title, text="English", fill=NAVY)
@@ -45,7 +56,7 @@ wrong_button.grid(row=1, column=0)
 
 # RIGHT ANSWER BUTTON
 check_image = PhotoImage(file="images/right.png")
-right_button = Button(image=check_image, borderwidth=0, bg=BACKGROUND, command=next_card)
+right_button = Button(image=check_image, borderwidth=0, bg=BACKGROUND, command=right_card)
 right_button.grid(row=1, column=2)
 
 # FLIP THE CARD BUTTON
